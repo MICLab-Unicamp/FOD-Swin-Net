@@ -1,0 +1,94 @@
+network: "swin_transformers_96_patch"
+learning_rate: 0.000005
+epochs: 5000 # count epoch associated pacient number
+
+path_to_save_model: "models_h5/"
+reload_model:
+  type: False
+  data: "5_april_2024_patch_96"
+
+path_tmp_slice_degree: "tmp_slice_degree_visual_images"
+test_n_threads: 30
+path_bundles: "tractseg_output/bundle_segmentations"
+
+
+#----- Train test split
+random_dataset_split:
+  name: "SplitDataset"
+  parameters:
+    path: "../train"
+    #dataset 131 dados
+    train: 71
+    valid: 10
+    test: 50
+    seeds: 42
+    output_dir: "splits"
+
+optimizer:
+  Adam:
+    lr: 0.001
+    weight_decay: 0.0001
+
+model:
+  SwinEncDec:
+    img_size: !!python/tuple [96, 96, 96]
+    in_channels: 45
+    out_channels: 45
+    feature_size: 48
+    drop_rate: 0.0
+    attn_drop_rate: 0.0
+    dropout_path_rate: 0.0
+    use_checkpoint: True
+
+loss:
+  MSELoss: MSELoss
+  type: False
+
+#--- path save model
+path_save_model: 'models_h5/'
+name_model: 'model_batch_512.h5'
+
+adjust_input_test:
+  sr_fod_path: "swin_tmp_reconstruction_predicts/tmp_wm"
+  filter_min: 50
+  filter_max: 120
+  filter: False
+  size_batch: 20
+
+#----- wandb
+wandb: True
+
+train:
+  batch_size: 3
+
+valid:
+  batch_size: 6
+
+test:
+  batch_size: 1
+
+#Datasets-------------
+
+training_per_patches: "h5py"
+
+evaluate:
+  path_test: "/mnt/datahdd/dataset_organized/test"
+
+break_inside_train:
+  type: False
+  iterator: 1
+
+train_dataset:
+  ReadDataCropPre:
+    img_size: !!python/tuple [ 145, 174, 145 ]
+    patch_size: !!python/tuple [96, 96, 96]
+    size_3d_patch: 9
+    num_workers: 8
+
+
+valid_dataset:
+  ReadDataCropPre:
+    img_size: !!python/tuple [ 145, 174, 145 ]
+    patch_size: !!python/tuple [96, 96, 96]
+    size_3d_patch: 9
+    num_workers: 8
